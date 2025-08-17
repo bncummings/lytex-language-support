@@ -1,0 +1,25 @@
+{
+  "name": "lytex",
+  "displayName": "lytex language support",
+  "description": "Syntax highlighting for lytex- an extension of latex that supports lilypond rendering",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.103.0"
+  },
+  "categories": [
+    "Programming Languages"
+  ],
+  "contributes": {
+    "languages": [{
+      "id": "lytex",
+      "aliases": ["Lytex", "lytex"],
+      "extensions": [".lytex"],
+      "configuration": "./language-configuration.json"
+    }],
+    "grammars": [{
+      "language": "lytex",
+      "scopeName": "source.lytex",
+      "path": "./syntaxes/lytex.tmLanguage.json"
+    }]
+  }
+}
