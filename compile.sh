@@ -6,4 +6,4 @@ cd .lytex/
 
 lilypond-book --pdf ../$INPUT
 
-latexmk -pdf -outdir=..$OUTDIR -auxdir=aux example.tex 
+latexmk -pdf -pdflatex="pdflatex -halt-on-error -interaction=nonstopmode" -outdir=..$OUTDIR -auxdir=aux example.tex 
