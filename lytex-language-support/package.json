@@ -1,5 +1,5 @@
 {
-  "name": "lytex",
+  "name": "lytex-language-support",
   "displayName": "lytex language support",
   "description": "Syntax highlighting for lytex- an extension of latex that supports lilypond rendering",
   "version": "0.0.1",
