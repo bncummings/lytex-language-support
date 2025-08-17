@@ -1,5 +1,5 @@
 {
-  "scopeName": "text.tex.lytex",
+  "scopeName": "source.lytex",
   "name": "LyTeX",
   "patterns": [
     { "include": "text.tex.latex" },
