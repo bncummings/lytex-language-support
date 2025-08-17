@@ -1,0 +1,10 @@
+\documentclass{article}
+\begin{document}
+Some text.
+
+\begin{lilypond}
+  \relative c' { c4 d e f | g1 }
+\end{lilypond}
+
+Inline: \lilypond{ a'8 b c d }
+\end{document}

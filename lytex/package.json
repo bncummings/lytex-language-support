@@ -10,16 +10,35 @@
     "Programming Languages"
   ],
   "contributes": {
-    "languages": [{
-      "id": "lytex",
-      "aliases": ["Lytex", "lytex"],
-      "extensions": [".lytex"],
-      "configuration": "./language-configuration.json"
-    }],
-    "grammars": [{
-      "language": "lytex",
-      "scopeName": "source.lytex",
-      "path": "./syntaxes/lytex.tmLanguage.json"
-    }]
+    "languages": [
+      {
+        "id": "lytex",
+        "aliases": ["LyTeX", "lytex"],
+        "extensions": [".lytex"],
+        "configuration": "./language-configuration.json"
+      },
+      {
+        "id": "lilypond",
+        "aliases": ["LilyPond", "lilypond"],
+        "extensions": [".ly"]
+      }
+    ],
+    "grammars": [
+      {
+        "language": "lytex",
+        "scopeName": "source.lytex",
+        "path": "./syntaxes/lytex.tmLanguage.json",
+        "embeddedLanguages": { "source.lilypond": "lilypond" }
+      },
+      {
+        "language": "lilypond",
+        "scopeName": "source.lilypond",
+        "path": "./syntaxes/lilypond.tmLanguage.json"
+      },
+      {
+        "scopeName": "text.tex.latex",
+        "path": "./syntaxes/latex.tmLanguage.json"
+      }
+    ]
   }
 }
