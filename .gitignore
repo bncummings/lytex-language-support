@@ -1,0 +1,9 @@
+node_modules
+out
+dist
+.vscode-test
+.eslintcache
+*.DS_Store*
+*.vsix
+**/*.js.map
+**/*.d.ts
