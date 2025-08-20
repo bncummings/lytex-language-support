@@ -20,6 +20,15 @@ export function activate(context: vscode.ExtensionContext) {
 	});
 
 	context.subscriptions.push(disposable);
+
+	const editorMenuDisposable = vscode.commands.registerCommand('lytex-preview.previewLytexFile', () => {
+		// The code you place here will be executed every time your command is executed
+		// Display a message box to the user
+		vscode.window.showInformationMessage('You did it woohoo!');
+	});
+	
+	context.subscriptions.push(editorMenuDisposable);
+	
 }
 
 // This method is called when your extension is deactivated

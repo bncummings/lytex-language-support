@@ -16,8 +16,38 @@
       {
         "command": "lytex-preview.helloWorld",
         "title": "Hello World"
+      },
+      {
+        "command": "lytex-preview.previewLytexFile",
+        "title": "Preview LyTeX File"
       }
-    ]
+    ],
+    "menus": {
+      "commandPalette": [
+        {
+          "command": "lytex-preview.previewLytexFile",
+          "when": "editorHasSelection"
+        }
+      ],
+      "explorer/context": [
+        {
+          "command": "lytex-preview.previewLytexFile",
+          "when": "resourceExtname == .lytex"
+        }
+      ],
+      "editor/context": [
+        {
+          "command": "lytex-preview.previewLytexFile",
+          "when": "resourceExtname == .lytex"
+        }
+      ],
+      "editor/title/context": [
+        {
+          "command": "lytex-preview.previewLytexFile",
+          "when": "resourceExtname == .lytex"
+        }
+      ]
+    }
   },
   "scripts": {
     "vscode:prepublish": "npm run package",
