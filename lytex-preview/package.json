@@ -20,18 +20,30 @@
       {
         "command": "lytex-preview.previewLytexFile",
         "title": "Preview LyTeX File"
+      },
+      {
+        "command": "lytex-preview.compileLytexFile",
+        "title": "Compile LyTeX File to PDF"
       }
     ],
     "menus": {
       "commandPalette": [
         {
           "command": "lytex-preview.previewLytexFile",
-          "when": "editorHasSelection"
+          "when": "resourceExtname == .lytex"
+        },
+        {
+          "command": "lytex-preview.compileLytexFile",
+          "when": "resourceExtname == .lytex"
         }
       ],
       "explorer/context": [
         {
           "command": "lytex-preview.previewLytexFile",
+          "when": "resourceExtname == .lytex"
+        },
+        {
+          "command": "lytex-preview.compileLytexFile",
           "when": "resourceExtname == .lytex"
         }
       ],
@@ -39,11 +51,19 @@
         {
           "command": "lytex-preview.previewLytexFile",
           "when": "resourceExtname == .lytex"
+        },
+        {
+          "command": "lytex-preview.compileLytexFile",
+          "when": "resourceExtname == .lytex"
         }
       ],
       "editor/title/context": [
         {
           "command": "lytex-preview.previewLytexFile",
+          "when": "resourceExtname == .lytex"
+        },
+        {
+          "command": "lytex-preview.compileLytexFile",
           "when": "resourceExtname == .lytex"
         }
       ]

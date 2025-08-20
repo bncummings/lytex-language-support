@@ -21,13 +21,21 @@ export function activate(context: vscode.ExtensionContext) {
 
 	context.subscriptions.push(disposable);
 
-	const editorMenuDisposable = vscode.commands.registerCommand('lytex-preview.previewLytexFile', () => {
+	const previewMenuDisposable = vscode.commands.registerCommand('lytex-preview.previewLytexFile', () => {
 		// The code you place here will be executed every time your command is executed
 		// Display a message box to the user
 		vscode.window.showInformationMessage('You did it woohoo!');
 	});
 	
-	context.subscriptions.push(editorMenuDisposable);
+	context.subscriptions.push(previewMenuDisposable);
+
+	const compileMenuDisposable = vscode.commands.registerCommand('lytex-preview.compileLytexFile', () => {
+		// The code you place here will be executed every time your command is executed
+		// Display a message box to the user
+		vscode.window.showInformationMessage('compiling lytex beep beep boop!');
+	});
+	
+	context.subscriptions.push(compileMenuDisposable);
 	
 }
 
