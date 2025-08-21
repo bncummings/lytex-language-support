@@ -1,0 +1,31 @@
+\documentclass{article}
+\begin{document}
+
+\section{Simple LyTeX Example}
+
+This is a simple document with embedded LilyPond music.
+
+\begin{lilypond}
+\relative c' { 
+  c4 d e f | 
+  g4 f e d | 
+  c1 
+}
+\end{lilypond}
+
+Here's another musical example:
+
+\begin{lilypond}
+\new Staff {
+  \clef treble
+  \time 4/4
+  \key c \major
+  \relative c'' {
+    g4 a b c |
+    d2 c4 b |
+    a2 g |
+  }
+}
+\end{lilypond}
+
+\end{document}

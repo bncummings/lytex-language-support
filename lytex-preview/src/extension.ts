@@ -1,6 +1,17 @@
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
+import * as cp from 'child_process';
+import * as path from 'path';
+
+// Function to check if LilyPond is installed
+function checkLilyPondInstallation(): Promise<boolean> {
+	return new Promise((resolve) => {
+		cp.exec('lilypond --version', (error) => {
+			resolve(!error);
+		});
+	});
+}
 
 // This method is called when your extension is activated
 // Your extension is activated the very first time the command is executed
@@ -9,6 +20,21 @@ export function activate(context: vscode.ExtensionContext) {
 	// Use the console to output diagnostic information (console.log) and errors (console.error)
 	// This line of code will only be executed once when your extension is activated
 	console.log('Congratulations, your extension "lytex-preview" is now active!');
+
+	// Check if LilyPond is installed
+	checkLilyPondInstallation().then((isInstalled) => {
+		if (!isInstalled) {
+			vscode.window.showWarningMessage(
+				'LilyPond is not installed or not in PATH. LyTeX compilation will not work.',
+				'Install LilyPond',
+				'Dismiss'
+			).then((selection) => {
+				if (selection === 'Install LilyPond') {
+					vscode.env.openExternal(vscode.Uri.parse('https://lilypond.org/'));
+				}
+			});
+		}
+	});
 
 	// The command has been defined in the package.json file
 	// Now provide the implementation of the command with registerCommand
@@ -29,10 +55,41 @@ export function activate(context: vscode.ExtensionContext) {
 	
 	context.subscriptions.push(previewMenuDisposable);
 
-	const compileMenuDisposable = vscode.commands.registerCommand('lytex-preview.compileLytexFile', () => {
-		// The code you place here will be executed every time your command is executed
-		// Display a message box to the user
-		vscode.window.showInformationMessage('compiling lytex beep beep boop!');
+	const compileMenuDisposable = vscode.commands.registerCommand('lytex-preview.compileLytexFile', (uri: vscode.Uri) => {
+		if (!uri) {
+			vscode.window.showErrorMessage('No file selected for compilation');
+			return;
+		}
+
+		const filePath = uri.fsPath;
+		
+		// Use the extension's context to find the correct path
+		const extensionPath = context.extensionPath;
+		const scriptPath = path.join(extensionPath, 'src', 'compile.sh');
+
+		console.log('Extension path:', extensionPath);
+		console.log('Script path:', scriptPath);
+		console.log('File path:', filePath);
+
+		// Execute the compile script with the file path as an argument
+		cp.exec(`bash "${scriptPath}" "${filePath}"`, { cwd: extensionPath }, (error, stdout, stderr) => {
+			if (error) {
+				vscode.window.showErrorMessage(`Compilation failed: ${error.message}`);
+				console.error('Compilation error:', error);
+				return;
+			}
+
+			if (stderr) {
+				vscode.window.showWarningMessage(`Compilation warning: ${stderr}`);
+				console.warn('Compilation stderr:', stderr);
+			}
+
+			if (stdout) {
+				console.log('Compilation stdout:', stdout);
+			}
+
+			vscode.window.showInformationMessage(`Successfully compiled: ${path.basename(filePath)}`);
+		});
 	});
 	
 	context.subscriptions.push(compileMenuDisposable);
