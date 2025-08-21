@@ -7,7 +7,7 @@ This is a simple document with embedded LilyPond music.
 
 \begin{lilypond}
 \relative c' { 
-  c4 d e f | 
+  c4 d8 e e e | 
   g4 f e d | 
   c1 
 }

@@ -52,8 +52,6 @@ export function activate(context: vscode.ExtensionContext) {
 		}
 
 		const filePath = uri.fsPath;
-		
-		// Use the extension's context to find the correct path
 		const extensionPath = context.extensionPath;
 		const scriptPath = path.join(extensionPath, 'src', 'compile.sh');
 

@@ -15,5 +15,5 @@
     lilypond-book --pdf "$INPUT" 2>&1 | grep -E "(error|Error|ERROR)"
 
     #extract the name from the file path and look for a tex file like that
-    latexmk -pdf -pdflatex="pdflatex -halt-on-error -interaction=nonstopmode" -outdir=..$OUTDIR -auxdir=aux $BASENAME.tex
+    latexmk -g -pdf -pdflatex="pdflatex -halt-on-error -interaction=nonstopmode" -outdir=..$OUTDIR -auxdir=aux $BASENAME.tex
 )
