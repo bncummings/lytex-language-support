@@ -1,7 +1,7 @@
 {
   "name": "lytex-preview",
   "displayName": "lytex-preview",
-  "description": "",
+  "description": "Preview and compile LyTeX files. Requires LilyPond to be installed.",
   "version": "0.0.1",
   "engines": {
     "vscode": "^1.103.0"
@@ -11,6 +11,10 @@
   ],
   "activationEvents": [],
   "main": "./dist/extension.js",
+  "extensionDependencies": [],
+  "systemRequirements": {
+    "lilypond": "Required for compiling LyTeX files. Install from https://lilypond.org/"
+  },
   "contributes": {
     "commands": [
       {
