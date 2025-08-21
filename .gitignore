@@ -2,6 +2,9 @@ node_modules
 out
 dist
 .vscode-test
+.lytex
+*.pdf
+*.tex
 .eslintcache
 *.DS_Store*
 *.vsix
