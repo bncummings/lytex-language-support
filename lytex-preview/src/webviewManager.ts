@@ -23,8 +23,9 @@ export function createWebviewPanel(context: vscode.ExtensionContext, filePath: s
     );
 
     /* Load and customize HTML template */
-    const htmlContent = loadWebviewHtml(context, baseName);
+    const htmlContent = loadWebviewHtml(context, baseName, webviewPanel.webview);
     webviewPanel.webview.html = htmlContent;
+
     webviewPanel.onDidDispose(() => {
         sessionManager.markWebviewDisposed(filePath);
         sessionManager.stopSession(filePath);
@@ -58,11 +59,16 @@ export function sendMessageToWebview(filePath: string, message: any): boolean {
     return sessionManager.sendMessageToWebview(filePath, message);
 }
 
-function loadWebviewHtml(context: vscode.ExtensionContext, baseName: string): string {
-    const htmlPath = path.join(context.extensionPath, 'src', 'webview.html');
-    const htmlContent = fs.readFileSync(htmlPath, 'utf8');
+function loadWebviewHtml(context: vscode.ExtensionContext, baseName: string, webview: vscode.Webview): string {
+    const htmlPath = path.join(context.extensionPath, 'src', 'webview', 'webview.html');
+    const scriptPath = path.join(context.extensionPath, 'src', 'webview', 'webview.js');
+    const scriptUri = webview.asWebviewUri(vscode.Uri.file(scriptPath));
+
+    let htmlContent = fs.readFileSync(htmlPath, 'utf8');
+    htmlContent = htmlContent.replace('{{FILENAME}}', `${baseName}.lytex`);
+    htmlContent = htmlContent.replace('{{WEBVIEW_SCRIPT_URI}}', scriptUri.toString());
     
-    return htmlContent.replace('{{FILENAME}}', `${baseName}.lytex`);
+    return htmlContent;
 }
 
 async function handleSuccessfulCompilation(filePath: string, pdfPath: string): Promise<void> {

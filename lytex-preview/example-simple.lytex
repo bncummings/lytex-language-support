@@ -4,7 +4,7 @@
 \section{Simple LyTeX Example}
 
 This is a simple document with embedded LilyPond music.
-This is a change made.
+This is a change made. This is another change.
 
 \begin{lilypond}
 \relative c' { 
