@@ -1,13 +1,12 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 import * as fs from 'fs';
-import { createWebviewPanel } from './webview';
 
 /* Global state for preview sessions */
 const activePreviewSessions = new Map<string, vscode.Disposable>();
 const statusBarItems = new Map<string, vscode.StatusBarItem>();
 const activeWebviews = new Map<string, vscode.WebviewPanel>();
-
+const webviewDisposedFlags = new Map<string, boolean>();
 
 export const preview = (context: vscode.ExtensionContext) =>  async (uri: vscode.Uri) => {
     if (!uri) {
@@ -37,7 +36,7 @@ export const preview = (context: vscode.ExtensionContext) =>  async (uri: vscode
     const saveWatcher = vscode.workspace.onDidSaveTextDocument(async (document) => {
         if (document.uri.fsPath === filePath) {
             vscode.window.showInformationMessage(`Auto-save detected for ${baseName}.lytex`);
-            // TODO: Compilation on save
+            // Compilation on save will be implemented later
 
             /* Send compile message to webview */
             const webview = activeWebviews.get(filePath);
@@ -57,6 +56,38 @@ export const preview = (context: vscode.ExtensionContext) =>  async (uri: vscode
         `Preview session started for ${baseName}.lytex! Webview opened side by side.`
     );
 };
+
+export function createWebviewPanel(context: vscode.ExtensionContext, filePath: string): vscode.WebviewPanel {
+    const baseName = path.basename(filePath, '.lytex');
+    
+    const webviewPanel = vscode.window.createWebviewPanel(
+        'lytexPreview',
+        `Preview: ${baseName}`,
+        vscode.ViewColumn.Beside,
+        {
+            enableScripts: true,
+            retainContextWhenHidden: true,
+            localResourceRoots: [vscode.Uri.file(context.extensionPath)]
+        }
+    );
+
+    // Read the HTML template
+    const htmlPath = path.join(context.extensionPath, 'src', 'webview.html');
+    let htmlContent = fs.readFileSync(htmlPath, 'utf8');
+    
+    // Replace placeholder with actual filename
+    htmlContent = htmlContent.replace('{{FILENAME}}', baseName + '.lytex');
+    webviewPanel.webview.html = htmlContent;
+
+    // Handle webview disposal - stop the preview session when webview is closed
+    webviewPanel.onDidDispose(() => {
+        webviewDisposedFlags.set(filePath, true);
+        stopPreviewSession(filePath);
+        vscode.window.showInformationMessage(`Preview session stopped for ${baseName}.lytex (webview closed).`);
+    });
+
+    return webviewPanel;
+}
 
 function createStatusBarItem(filePath: string): vscode.StatusBarItem {
     const baseName = path.basename(filePath, '.lytex');
@@ -105,6 +136,7 @@ function stopPreviewSession(filePath: string) {
     const session = activePreviewSessions.get(filePath);
     const statusBarItem = statusBarItems.get(filePath);
     const webviewPanel = activeWebviews.get(filePath);
+    const isWebviewDisposed = webviewDisposedFlags.get(filePath);
     
     if (session) {
         session.dispose();
@@ -116,10 +148,14 @@ function stopPreviewSession(filePath: string) {
         statusBarItems.delete(filePath);
     }
     
-    if (webviewPanel) {
+    // Only dispose webview if it hasn't been disposed already
+    if (webviewPanel && !isWebviewDisposed) {
         webviewPanel.dispose();
-        activeWebviews.delete(filePath);
     }
+    
+    // Clean up tracking maps
+    activeWebviews.delete(filePath);
+    webviewDisposedFlags.delete(filePath);
 }
 
 /* Clean up all active preview sessions and status bar items */
@@ -131,4 +167,5 @@ export function cleanUpPreviewSessions() {
     activePreviewSessions.clear();
     statusBarItems.clear();
     activeWebviews.clear();
+    webviewDisposedFlags.clear();
 };
