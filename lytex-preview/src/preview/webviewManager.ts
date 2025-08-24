@@ -1,8 +1,8 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 import * as fs from 'fs';
-import { sessionManager } from './sessionManager';
-import { compileLytexFile } from './compile';
+import { sessionManager } from '../sessionManager';
+import { compileLytexFile } from '../compile/compile';
 
 export function createWebviewPanel(context: vscode.ExtensionContext, filePath: string): vscode.WebviewPanel {
     const baseName = path.basename(filePath, '.lytex');
@@ -60,8 +60,8 @@ export function sendMessageToWebview(filePath: string, message: any): boolean {
 }
 
 function loadWebviewHtml(context: vscode.ExtensionContext, baseName: string, webview: vscode.Webview): string {
-    const htmlPath = path.join(context.extensionPath, 'src', 'webview', 'webview.html');
-    const scriptPath = path.join(context.extensionPath, 'src', 'webview', 'webview.js');
+    const htmlPath = path.join(context.extensionPath, 'src', 'preview', 'webview.html');
+    const scriptPath = path.join(context.extensionPath, 'src', 'preview', 'webview.js');
     const scriptUri = webview.asWebviewUri(vscode.Uri.file(scriptPath));
 
     let htmlContent = fs.readFileSync(htmlPath, 'utf8');

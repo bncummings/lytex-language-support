@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import * as cp from 'child_process';
-import { compileLytex } from './compile';
-import { preview, stopPreview, cleanUpPreviewSessions } from './preview';
+import { compileLytex } from './compile/compile';
+import { preview, stopPreview, cleanUpPreviewSessions } from './preview/preview';
 
 /* Function to check if LilyPond is installed */
 function checkLilyPondInstallation(): Promise<boolean> {

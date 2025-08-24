@@ -5,10 +5,10 @@ export function createStatusBarItem(filePath: string): vscode.StatusBarItem {
     const baseName = path.basename(filePath, '.lytex');
     const statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 100);
 
-    statusBarItem.text = `$(stop-circle) ${baseName} Preview`;
+    statusBarItem.text = `$(stop-circle) Preview: ${baseName}`;
     statusBarItem.tooltip = `Click to stop preview session for ${baseName}.lytex`;
     statusBarItem.command = 'lytex-preview.stopPreviewSession';
-    statusBarItem.color = '#ff6b6b'; // Red color
+    statusBarItem.color = '#ff6b6b'; // Red
     statusBarItem.backgroundColor = new vscode.ThemeColor('statusBarItem.errorBackground');
     statusBarItem.show();
 

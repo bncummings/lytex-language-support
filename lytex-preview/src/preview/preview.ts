@@ -1,8 +1,8 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
-import { sessionManager } from './sessionManager';
+import { sessionManager } from '../sessionManager';
 import { createWebviewPanel, compileAndDisplayPDF } from './webviewManager';
-import { createStatusBarItem } from './statusBarManager';
+import { createStatusBarItem } from '../statusBarManager';
 
 export const preview = (context: vscode.ExtensionContext) => async (uri: vscode.Uri) => {
     if (!uri) {

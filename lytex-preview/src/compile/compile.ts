@@ -2,12 +2,12 @@ import * as vscode from 'vscode';
 import * as cp from 'child_process';
 import * as path from 'path';
 import * as fs from 'fs';
-import { CompileResult } from './types';
+import { CompileResult } from '../types';
 
 export async function compileLytexFile(context: vscode.ExtensionContext, filePath: string): Promise<CompileResult> {
     const baseName = path.basename(filePath, '.lytex');
     const pdfPath = path.join(path.dirname(filePath), `${baseName}.pdf`);
-    const scriptPath = path.join(context.extensionPath, 'src', 'compile.sh');
+    const scriptPath = path.join(context.extensionPath, 'src', 'compile', 'compile.sh');
     
     console.log('Extension path:', context.extensionPath);
     console.log('Script path:', scriptPath);
