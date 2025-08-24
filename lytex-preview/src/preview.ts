@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 import { sessionManager } from './sessionManager';
-import { createWebviewPanel, sendMessageToWebview } from './webviewManager';
+import { createWebviewPanel, compileAndDisplayPDF } from './webviewManager';
 import { createStatusBarItem } from './statusBarManager';
 
 export const preview = (context: vscode.ExtensionContext) => async (uri: vscode.Uri) => {
@@ -30,21 +30,34 @@ export const preview = (context: vscode.ExtensionContext) => async (uri: vscode.
     /* Start preview session - watch for saves on this file */
     const saveWatcher = vscode.workspace.onDidSaveTextDocument(async (document) => {
         if (document.uri.fsPath === filePath) {
-            vscode.window.showInformationMessage(`Auto-save detected for ${baseName}.lytex`);
-            // Compilation on save will be implemented later
-
-            /* Send compile message to webview */
-            sendMessageToWebview(filePath, { command: 'compile' });
+            vscode.window.showInformationMessage(`Auto-save detected for ${baseName}.lytex - recompiling...`);
+            
+            try {
+                await compileAndDisplayPDF(context, filePath);
+                vscode.window.showInformationMessage(`Recompiled ${baseName}.lytex successfully!`);
+            } catch (error) {
+                vscode.window.showErrorMessage(`Recompilation failed: ${error}`);
+            }
         }
     });
 
     /* Store the session and create status bar item */
     const statusBarItem = createStatusBarItem(filePath);
     sessionManager.createSession(filePath, saveWatcher, statusBarItem, webviewPanel);
-          
+
+    /* Initial compilation */
     vscode.window.showInformationMessage(
-        `Preview session started for ${baseName}.lytex! Webview opened side by side.`
+        `Preview session started for ${baseName}.lytex! Compiling...`
     );
+
+    try {
+        await compileAndDisplayPDF(context, filePath);
+        vscode.window.showInformationMessage(
+            `${baseName}.lytex compiled successfully! Save the file to auto-recompile.`
+        );
+    } catch (error) {
+        vscode.window.showErrorMessage(`Initial compilation failed: ${error}`);
+    }
 };
 
 export const stopPreview = (context: vscode.ExtensionContext) => () => {
