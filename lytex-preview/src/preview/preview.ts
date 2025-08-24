@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
-import { sessionManager } from '../previewSessionManager';
+import { sessionManager } from './previewSessionManager';
 import { createWebviewPanel, compileAndDisplayPDF } from './webviewManager';
 import { createStatusBarItem } from '../statusBarManager';
 

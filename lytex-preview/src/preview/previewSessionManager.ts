@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { PreviewSession, SessionManager } from './types';
+import { PreviewSession, SessionManager } from '../types';
 
 /* Global state for preview sessions */
 const activePreviewSessions = new Map<string, vscode.Disposable>();

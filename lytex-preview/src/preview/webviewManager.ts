@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 import * as fs from 'fs';
-import { sessionManager } from '../previewSessionManager';
+import { sessionManager } from './previewSessionManager';
 import { compileLytexFile } from '../compile/compile';
 
 /**
@@ -34,7 +34,6 @@ export function createWebviewPanel(context: vscode.ExtensionContext, filePath: s
     webviewPanel.webview.html = htmlContent;
 
     webviewPanel.onDidDispose(() => {
-        //sessionManager.markWebviewDisposed(filePath);
         sessionManager.stopSession(filePath);
         vscode.window.showInformationMessage(`Preview session stopped for ${baseName}.lytex (webview closed).`);
     });
