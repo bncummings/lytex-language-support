@@ -4,12 +4,13 @@
 \section{Simple LyTeX Example}
 
 This is a simple document with embedded LilyPond music.
+This is a change made.
 
 \begin{lilypond}
 \relative c' { 
-  c4 d8 e e e | 
+  c4 d8 e e g8 | 
   g4 f e d | 
-  c1 
+  c4
 }
 \end{lilypond}
 
@@ -18,7 +19,7 @@ Here's another musical example:
 \begin{lilypond}
 \new Staff {
   \clef treble
-  \time 4/4
+  \time 3/4
   \key c \major
   \relative c'' {
     g4 a b c |

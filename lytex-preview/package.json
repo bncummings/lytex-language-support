@@ -11,7 +11,9 @@
   ],
   "activationEvents": [],
   "main": "./dist/extension.js",
-  "extensionDependencies": [],
+  "extensionDependencies": [
+    "tomoki1207.pdf"
+  ],
   "systemRequirements": {
     "lilypond": "Required for compiling LyTeX files. Install from https://lilypond.org/"
   },
@@ -23,11 +25,15 @@
       },
       {
         "command": "lytex-preview.previewLytexFile",
-        "title": "Preview LyTeX File"
+        "title": "Start a LyTeX Preview Session."
       },
       {
         "command": "lytex-preview.compileLytexFile",
         "title": "Compile LyTeX File to PDF"
+      },
+      {
+        "command": "lytex-preview.stopPreviewSession",
+        "title": "Stop LyTeX Preview Session"
       }
     ],
     "menus": {
