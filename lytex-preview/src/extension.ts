@@ -33,7 +33,7 @@ export function activate(context: vscode.ExtensionContext) {
 
 	const previewMenuDisposable = vscode.commands.registerCommand('lytex-preview.previewLytexFile', preview(context));
 	const compileMenuDisposable = vscode.commands.registerCommand('lytex-preview.compileLytexFile', compileLytex(context));
-	const stopPreviewDisposable = vscode.commands.registerCommand('lytex-preview.stopPreviewSession', stopPreview(context));
+	const stopPreviewDisposable = vscode.commands.registerCommand('lytex-preview.stopPreviewSession', stopPreview);
 
 	context.subscriptions.push(previewMenuDisposable);
 	context.subscriptions.push(compileMenuDisposable);

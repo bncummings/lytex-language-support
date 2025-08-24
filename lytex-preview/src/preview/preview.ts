@@ -4,6 +4,12 @@ import { sessionManager } from '../sessionManager';
 import { createWebviewPanel, compileAndDisplayPDF } from './webviewManager';
 import { createStatusBarItem } from '../statusBarManager';
 
+/**
+ * VS Code command handler for starting LyTeX preview sessions with live compilation.
+ * 
+ * @param {vscode.ExtensionContext} context - VS Code extension context
+ * @returns {(uri: vscode.Uri) => Promise<void>} Command handler function
+ */
 export const preview = (context: vscode.ExtensionContext) => async (uri: vscode.Uri) => {
     if (!uri) {
         vscode.window.showErrorMessage('No file selected for preview');
@@ -60,7 +66,10 @@ export const preview = (context: vscode.ExtensionContext) => async (uri: vscode.
     }
 };
 
-export const stopPreview = (context: vscode.ExtensionContext) => () => {
+/**
+ * VS Code command handler for stopping LyTeX preview sessions.
+ */
+export const stopPreview = () => {
     const activeEditor = vscode.window.activeTextEditor;
 
     /* Find the active preview session for the current file */
@@ -81,7 +90,9 @@ export const stopPreview = (context: vscode.ExtensionContext) => () => {
     }
 };
 
-/* Clean up all active preview sessions and status bar items */
+/**
+ * Cleans up all active preview sessions and disposes resources on extension deactivation.
+ */
 export function cleanUpPreviewSessions() {
     sessionManager.cleanup();
 };
