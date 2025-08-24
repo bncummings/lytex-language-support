@@ -4,6 +4,13 @@ import * as path from 'path';
 import * as fs from 'fs';
 import { CompileResult } from '../types';
 
+/**
+ * Compiles a LyTeX file to PDF using the compile.sh script.
+ * 
+ * @param {vscode.ExtensionContext} context VS Code extension context
+ * @param {string} filePath Path to the .lytex file
+ * @returns {Promise<CompileResult>} Promise resolving to compilation result with success status, PDF path, and output
+ */
 export async function compileLytexFile(context: vscode.ExtensionContext, filePath: string): Promise<CompileResult> {
     const baseName = path.basename(filePath, '.lytex');
     const pdfPath = path.join(path.dirname(filePath), `${baseName}.pdf`);
@@ -55,7 +62,10 @@ export async function compileLytexFile(context: vscode.ExtensionContext, filePat
 }
 
 /**
- * TODO rename thiss wrapper
+ * VS Code command handler for compiling LyTeX files with user feedback.
+ * 
+ * @param {vscode.ExtensionContext} context - VS Code extension context
+ * @returns {(uri: vscode.Uri) => Promise<void>} Command handler function
  */
 export const compileLytex = (context: vscode.ExtensionContext) => async (uri: vscode.Uri) => {
     if (!uri) {
