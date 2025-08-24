@@ -15,16 +15,15 @@ export const preview = (context: vscode.ExtensionContext) =>  async (uri: vscode
         vscode.window.showErrorMessage('Please select a .lytex file for preview');
         return;
     }
-    const filePath = uri.fsPath;
-    const fileKey = filePath;
 
-    // Check if already in preview session
-    // TODO: remove the option to start a preveiw session if one is already active
-    if (activePreviewSessions.has(fileKey)) {
+    const filePath = uri.fsPath;
+    const baseName = path.basename(filePath, '.lytex');
+    
+    /* Check if already in preview session. TODO: remove the option to start a preveiw session if one is already active */
+    if (activePreviewSessions.has(filePath)) {
         vscode.window.showInformationMessage('Preview session already active for this file!');
         return;
     }
-    const baseName = path.basename(filePath, '.lytex');        
     /* Start preview session - watch for saves on this file */
     const saveWatcher = vscode.workspace.onDidSaveTextDocument(async (document) => {
         if (document.uri.fsPath === filePath) {
@@ -34,9 +33,10 @@ export const preview = (context: vscode.ExtensionContext) =>  async (uri: vscode
     });
 
     /* Store the session and create status bar item */
-    activePreviewSessions.set(fileKey, saveWatcher);
+    activePreviewSessions.set(filePath, saveWatcher);
     const statusBarItem = createStatusBarItem(filePath);
-    statusBarItems.set(fileKey, statusBarItem);        
+    statusBarItems.set(filePath, statusBarItem); 
+          
     vscode.window.showInformationMessage(
         `Preview session started for ${baseName}.lytex! Session management active.`
     );
@@ -45,33 +45,36 @@ export const preview = (context: vscode.ExtensionContext) =>  async (uri: vscode
 function createStatusBarItem(filePath: string): vscode.StatusBarItem {
     const baseName = path.basename(filePath, '.lytex');
     const statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 100);
+
     statusBarItem.text = `$(stop-circle) ${baseName} Preview`;
     statusBarItem.tooltip = `Click to stop preview session for ${baseName}.lytex`;
     statusBarItem.command = 'lytex-preview.stopPreviewSession';
     statusBarItem.color = '#ff6b6b'; // Red color
     statusBarItem.backgroundColor = new vscode.ThemeColor('statusBarItem.errorBackground');
     statusBarItem.show();
+    
     return statusBarItem;
 }
 
 export const stopPreview = (context: vscode.ExtensionContext) => () => {
-        /* Find the active preview session for the current file */
-        const activeEditor = vscode.window.activeTextEditor;
-        if (activeEditor?.document.uri.fsPath.endsWith('.lytex')) {
-            const filePath = activeEditor.document.uri.fsPath;
+    const activeEditor = vscode.window.activeTextEditor;
+
+    /* Find the active preview session for the current file */
+    if (activeEditor?.document.uri.fsPath.endsWith('.lytex')) {
+        const filePath = activeEditor.document.uri.fsPath;
+        stopPreviewSession(filePath);
+        vscode.window.showInformationMessage('Preview session stopped.');
+    } else {
+        /* If no active .lytex file, stop all sessions */
+        const sessionCount = activePreviewSessions.size;
+        for (const [filePath] of activePreviewSessions) {
             stopPreviewSession(filePath);
-            vscode.window.showInformationMessage('Preview session stopped.');
-        } else {
-            /* If no active .lytex file, stop all sessions */
-            const sessionCount = activePreviewSessions.size;
-            for (const [filePath] of activePreviewSessions) {
-                stopPreviewSession(filePath);
-            }
-            if (sessionCount > 0) {
-                vscode.window.showInformationMessage(`Stopped ${sessionCount} preview session(s).`);
-            }
         }
-    };
+        if (sessionCount > 0) {
+            vscode.window.showInformationMessage(`Stopped ${sessionCount} preview session(s).`);
+        }
+    }
+};
 
 function stopPreviewSession(filePath: string) {
     const session = activePreviewSessions.get(filePath);
