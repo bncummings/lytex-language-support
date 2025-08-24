@@ -3,16 +3,12 @@ import * as cp from 'child_process';
 import { compileLytex } from './compile/compile';
 import { preview, stopPreview, cleanUpPreviewSessions } from './preview/preview';
 
-/* Function to check if LilyPond is installed */
-function checkLilyPondInstallation(): Promise<boolean> {
-	return new Promise((resolve) => {
-		cp.exec('lilypond --version', (error) => {
-			resolve(!error);
-		});
-	});
-}
 
-/* Handles activation house keeping */
+/**
+ * Extension activation handler that registers commands and checks dependencies.
+ * 
+ * @param {vscode.ExtensionContext} context - VS Code extension context
+ */
 export function activate(context: vscode.ExtensionContext) {
 	console.log('Congratulations, your extension "lytex-preview" is now active!');
 
@@ -40,7 +36,18 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(stopPreviewDisposable);
 }
 
-/* This method is called when your extension is deactivated */
+/**
+ * Extension deactivation handler that cleans up resources.
+ */
 export function deactivate() {
 	cleanUpPreviewSessions();
+}
+
+/* Function to check if LilyPond is installed */
+function checkLilyPondInstallation(): Promise<boolean> {
+	return new Promise((resolve) => {
+		cp.exec('lilypond --version', (error) => {
+			resolve(!error);
+		});
+	});
 }
