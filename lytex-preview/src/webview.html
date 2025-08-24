@@ -8,35 +8,24 @@
         body {
             font-family: var(--vscode-font-family);
             color: var(--vscode-foreground);
-            background-color: var(--vscode-editor-background);
+            background: var(--vscode-editor-background);
             margin: 0;
-            padding: 0;
             height: 100vh;
             display: flex;
             flex-direction: column;
         }
         
-        .header {
-            background-color: var(--vscode-panel-background);
-            padding: 10px 20px;
+        header {
+            background: var(--vscode-panel-background);
+            padding: 8px 12px;
             border-bottom: 1px solid var(--vscode-panel-border);
-            flex-shrink: 0;
+            font-size: 13px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
         
-        .title {
-            font-size: 16px;
-            font-weight: bold;
-            margin: 0;
-            color: var(--vscode-textLink-foreground);
-        }
-        
-        .status {
-            font-size: 12px;
-            margin: 2px 0 0 0;
-            opacity: 0.8;
-        }
-        
-        .content {
+        main {
             flex: 1;
             display: flex;
             align-items: center;
@@ -46,110 +35,92 @@
         
         .placeholder {
             text-align: center;
-            padding: 40px;
-            max-width: 400px;
+            padding: 20px;
         }
         
-        .placeholder h3 {
-            margin-bottom: 20px;
-            color: var(--vscode-textLink-foreground);
-        }
-        
-        .loading {
-            color: var(--vscode-charts-orange);
-        }
-        
-        .error {
-            color: var(--vscode-errorForeground);
-        }
+        .error { color: var(--vscode-errorForeground); }
+        .loading { color: var(--vscode-charts-orange); }
         
         .pdf-container {
             width: 100%;
             height: 100%;
             display: none;
             flex-direction: column;
-            background-color: #525659;
         }
         
-        .pdf-controls {
-            background-color: var(--vscode-panel-background);
-            padding: 8px 16px;
-            border-bottom: 1px solid var(--vscode-panel-border);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            flex-shrink: 0;
-        }
-        
-        .pdf-controls button {
-            background-color: var(--vscode-button-background);
-            color: var(--vscode-button-foreground);
-            border: none;
+        .controls {
+            background: var(--vscode-panel-background);
             padding: 4px 8px;
-            border-radius: 2px;
-            cursor: pointer;
+            border-bottom: 1px solid var(--vscode-panel-border);
             font-size: 12px;
         }
         
-        .pdf-controls button:hover {
-            background-color: var(--vscode-button-hoverBackground);
+        .controls button, .controls input {
+            background: var(--vscode-button-background);
+            color: var(--vscode-button-foreground);
+            border: none;
+            padding: 2px 6px;
+            margin: 0 2px;
+            cursor: pointer;
         }
         
-        .pdf-controls input {
-            width: 60px;
-            background-color: var(--vscode-input-background);
+        .controls button:hover {
+            background: var(--vscode-button-hoverBackground);
+        }
+        
+        .controls input {
+            width: 40px;
+            text-align: center;
+            background: var(--vscode-input-background);
             color: var(--vscode-input-foreground);
             border: 1px solid var(--vscode-input-border);
-            padding: 2px 4px;
-            text-align: center;
         }
         
-        .pdf-viewer {
+        .viewer {
             flex: 1;
             overflow: auto;
-            background-color: #525659;
             display: flex;
             justify-content: center;
-            padding: 20px;
+            align-items: flex-start;
+            padding: 10px;
+            background: #525659;
         }
         
-        #pdf-canvas {
-            border: 1px solid #000;
-            background-color: white;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        canvas {
+            background: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
         }
     </style>
     <!-- Load PDF.js from CDN -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 </head>
 <body>
-    <div class="header">
-        <div class="title">🎼 LyTeX Preview - <span id="filename">{{FILENAME}}</span></div>
-        <div class="status" id="status">Initializing...</div>
-    </div>
+    <header>
+        <div>LyTeX Preview:  <span id="filename">{{FILENAME}}</span></div>
+        <div id="status">Initializing...</div>
+    </header>
     
-    <div class="content">
+    <main>
         <div class="placeholder" id="placeholder">
             <h3>LyTeX Preview</h3>
             <p id="message">Compiling your LilyPond + LaTeX document...</p>
         </div>
         
         <div class="pdf-container" id="pdf-container">
-            <div class="pdf-controls">
-                <button id="prev-page">Previous</button>
-                <span>Page: </span>
+            <div class="controls">
+                <button id="prev-page">‹</button>
                 <input type="number" id="page-num" value="1" min="1">
-                <span>/ <span id="page-count">--</span></span>
-                <button id="next-page">Next</button>
-                <button id="zoom-in">Zoom In</button>
-                <button id="zoom-out">Zoom Out</button>
-                <span id="zoom-level">100%</span>
+                / <span id="page-count">--</span>
+                <button id="next-page">›</button>
+                <button id="zoom-out">−</button>
+                <span id="zoom-level">160%</span>
+                <button id="zoom-in">+</button>
             </div>
-            <div class="pdf-viewer">
+            <div class="viewer">
                 <canvas id="pdf-canvas"></canvas>
             </div>
         </div>
-    </div>
+    </main>
     
     <script>
         // ==============================================
@@ -177,7 +148,7 @@
             pageNum: 1,
             pageRendering: false,
             pageNumPending: null,
-            scale: 1.2
+            scale: 1.6
         };
         
         const ctx = elements.canvas.getContext('2d');
@@ -335,6 +306,7 @@
         // ==============================================
         window.addEventListener('message', event => handleExtensionMessage(event.data));
         setupPDFControls();
+        updateZoomDisplay();
         showPlaceholder('Waiting for compilation...');
     </script>
 </body>
