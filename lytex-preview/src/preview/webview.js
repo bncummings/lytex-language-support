@@ -112,13 +112,13 @@ function loadPDF(base64Data) {
 function setupPDFControls() {
     // Navigation
     document.getElementById('prev-page').addEventListener('click', () => {
-        if (pdfState.pageNum <= 1) return;
+        if (pdfState.pageNum <= 1) { return; };
         pdfState.pageNum--;
         queueRenderPage(pdfState.pageNum);
     });
     
     document.getElementById('next-page').addEventListener('click', () => {
-        if (pdfState.pageNum >= pdfState.doc.numPages) return;
+        if (pdfState.pageNum >= pdfState.doc.numPages) { return; };
         pdfState.pageNum++;
         queueRenderPage(pdfState.pageNum);
     });
@@ -131,7 +131,7 @@ function setupPDFControls() {
     });
     
     document.getElementById('zoom-out').addEventListener('click', () => {
-        if (pdfState.scale <= 0.4) return;
+        if (pdfState.scale <= 0.4) { return; };
         pdfState.scale -= 0.2;
         updateZoomDisplay();
         queueRenderPage(pdfState.pageNum);
