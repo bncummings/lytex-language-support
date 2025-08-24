@@ -9,8 +9,8 @@ This is a change made.
 \begin{lilypond}
 \relative c' { 
   c4 d8 e e g8 | 
-  g4 f2 e4 d4 | 
-  c4
+  g4 f2 e4 d8 | 
+  c8
 }
 \end{lilypond}
 

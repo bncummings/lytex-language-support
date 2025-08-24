@@ -2,14 +2,7 @@ import * as vscode from 'vscode';
 import * as cp from 'child_process';
 import * as path from 'path';
 import * as fs from 'fs';
-
-export interface CompileResult {
-    success: boolean;
-    pdfPath?: string;
-    error?: string;
-    stdout?: string;
-    stderr?: string;
-}
+import { CompileResult } from './types';
 
 export async function compileLytexFile(context: vscode.ExtensionContext, filePath: string): Promise<CompileResult> {
     const baseName = path.basename(filePath, '.lytex');

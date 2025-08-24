@@ -21,3 +21,11 @@ export interface SessionManager {
     getAllSessions(): Map<string, PreviewSession>;
     cleanup(): void;
 }
+
+export interface CompileResult {
+    success: boolean;
+    pdfPath?: string;
+    error?: string;
+    stdout?: string;
+    stderr?: string;
+}

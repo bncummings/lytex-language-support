@@ -152,69 +152,86 @@
     </div>
     
     <script>
+        // ==============================================
+        // PDF.js Configuration & Global Variables
+        // ==============================================
         console.log('LyTeX Preview webview loaded');
         
-        // PDF.js setup
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
         
-        const statusEl = document.getElementById('status');
-        const messageEl = document.getElementById('message');
-        const placeholderEl = document.getElementById('placeholder');
-        const pdfContainerEl = document.getElementById('pdf-container');
-        const canvas = document.getElementById('pdf-canvas');
-        const ctx = canvas.getContext('2d');
-        const pageNumEl = document.getElementById('page-num');
-        const pageCountEl = document.getElementById('page-count');
-        const zoomLevelEl = document.getElementById('zoom-level');
+        // DOM Elements
+        const elements = {
+            status: document.getElementById('status'),
+            message: document.getElementById('message'),
+            placeholder: document.getElementById('placeholder'),
+            pdfContainer: document.getElementById('pdf-container'),
+            canvas: document.getElementById('pdf-canvas'),
+            pageNum: document.getElementById('page-num'),
+            pageCount: document.getElementById('page-count'),
+            zoomLevel: document.getElementById('zoom-level')
+        };
         
-        let pdfDoc = null;
-        let pageNum = 1;
-        let pageRendering = false;
-        let pageNumPending = null;
-        let scale = 1.2;
+        // PDF State
+        const pdfState = {
+            doc: null,
+            pageNum: 1,
+            pageRendering: false,
+            pageNumPending: null,
+            scale: 1.2
+        };
         
+        const ctx = elements.canvas.getContext('2d');
+        
+        // ==============================================
+        // UI Control Functions
+        // ==============================================
         function showPlaceholder(message, className = '') {
-            placeholderEl.style.display = 'block';
-            pdfContainerEl.style.display = 'none';
-            messageEl.textContent = message;
-            messageEl.className = className;
+            elements.placeholder.style.display = 'block';
+            elements.pdfContainer.style.display = 'none';
+            elements.message.textContent = message;
+            elements.message.className = className;
         }
         
         function showPDF() {
-            placeholderEl.style.display = 'none';
-            pdfContainerEl.style.display = 'flex';
+            elements.placeholder.style.display = 'none';
+            elements.pdfContainer.style.display = 'flex';
         }
         
+        function updateZoomDisplay() {
+            elements.zoomLevel.textContent = Math.round(pdfState.scale * 100) + '%';
+        }
+        
+        // ==============================================
+        // PDF Rendering Functions
+        // ==============================================
         function renderPage(num) {
-            pageRendering = true;
+            pdfState.pageRendering = true;
             
-            pdfDoc.getPage(num).then(function(page) {
-                const viewport = page.getViewport({ scale: scale });
-                canvas.height = viewport.height;
-                canvas.width = viewport.width;
+            pdfState.doc.getPage(num).then(page => {
+                const viewport = page.getViewport({ scale: pdfState.scale });
+                elements.canvas.height = viewport.height;
+                elements.canvas.width = viewport.width;
                 
                 const renderContext = {
                     canvasContext: ctx,
                     viewport: viewport
                 };
                 
-                const renderTask = page.render(renderContext);
-                
-                renderTask.promise.then(function() {
-                    pageRendering = false;
-                    if (pageNumPending !== null) {
-                        renderPage(pageNumPending);
-                        pageNumPending = null;
+                page.render(renderContext).promise.then(() => {
+                    pdfState.pageRendering = false;
+                    if (pdfState.pageNumPending !== null) {
+                        renderPage(pdfState.pageNumPending);
+                        pdfState.pageNumPending = null;
                     }
                 });
             });
             
-            pageNumEl.value = num;
+            elements.pageNum.value = num;
         }
         
         function queueRenderPage(num) {
-            if (pageRendering) {
-                pageNumPending = num;
+            if (pdfState.pageRendering) {
+                pdfState.pageNumPending = num;
             } else {
                 renderPage(num);
             }
@@ -225,67 +242,73 @@
             
             const pdfData = 'data:application/pdf;base64,' + base64Data;
             
-            pdfjsLib.getDocument(pdfData).promise.then(function(pdf) {
-                pdfDoc = pdf;
-                pageCountEl.textContent = pdf.numPages;
-                
-                console.log('PDF loaded successfully, pages:', pdf.numPages);
-                showPDF();
-                renderPage(pageNum);
-                
-            }).catch(function(error) {
-                console.error('Error loading PDF:', error);
-                showPlaceholder('Error loading PDF: ' + error.message, 'error');
+            pdfjsLib.getDocument(pdfData).promise
+                .then(pdf => {
+                    pdfState.doc = pdf;
+                    elements.pageCount.textContent = pdf.numPages;
+                    
+                    console.log('PDF loaded successfully, pages:', pdf.numPages);
+                    showPDF();
+                    renderPage(pdfState.pageNum);
+                })
+                .catch(error => {
+                    console.error('Error loading PDF:', error);
+                    showPlaceholder('Error loading PDF: ' + error.message, 'error');
+                });
+        }
+        
+        // ==============================================
+        // Event Handlers
+        // ==============================================
+        function setupPDFControls() {
+            // Navigation
+            document.getElementById('prev-page').addEventListener('click', () => {
+                if (pdfState.pageNum <= 1) return;
+                pdfState.pageNum--;
+                queueRenderPage(pdfState.pageNum);
+            });
+            
+            document.getElementById('next-page').addEventListener('click', () => {
+                if (pdfState.pageNum >= pdfState.doc.numPages) return;
+                pdfState.pageNum++;
+                queueRenderPage(pdfState.pageNum);
+            });
+            
+            // Zoom
+            document.getElementById('zoom-in').addEventListener('click', () => {
+                pdfState.scale += 0.2;
+                updateZoomDisplay();
+                queueRenderPage(pdfState.pageNum);
+            });
+            
+            document.getElementById('zoom-out').addEventListener('click', () => {
+                if (pdfState.scale <= 0.4) return;
+                pdfState.scale -= 0.2;
+                updateZoomDisplay();
+                queueRenderPage(pdfState.pageNum);
+            });
+            
+            // Page input
+            elements.pageNum.addEventListener('change', function() {
+                const num = parseInt(this.value);
+                if (num >= 1 && num <= pdfState.doc.numPages) {
+                    pdfState.pageNum = num;
+                    queueRenderPage(pdfState.pageNum);
+                }
             });
         }
         
-        // Controls
-        document.getElementById('prev-page').addEventListener('click', function() {
-            if (pageNum <= 1) return;
-            pageNum--;
-            queueRenderPage(pageNum);
-        });
-        
-        document.getElementById('next-page').addEventListener('click', function() {
-            if (pageNum >= pdfDoc.numPages) return;
-            pageNum++;
-            queueRenderPage(pageNum);
-        });
-        
-        document.getElementById('zoom-in').addEventListener('click', function() {
-            scale += 0.2;
-            zoomLevelEl.textContent = Math.round(scale * 100) + '%';
-            queueRenderPage(pageNum);
-        });
-        
-        document.getElementById('zoom-out').addEventListener('click', function() {
-            if (scale <= 0.4) return;
-            scale -= 0.2;
-            zoomLevelEl.textContent = Math.round(scale * 100) + '%';
-            queueRenderPage(pageNum);
-        });
-        
-        pageNumEl.addEventListener('change', function() {
-            const num = parseInt(this.value);
-            if (num >= 1 && num <= pdfDoc.numPages) {
-                pageNum = num;
-                queueRenderPage(pageNum);
-            }
-        });
-        
-        // Listen for messages from the extension
-        window.addEventListener('message', event => {
-            const message = event.data;
+        function handleExtensionMessage(message) {
             console.log('Received message:', message);
             
             switch (message.command) {
                 case 'compile':
-                    statusEl.textContent = 'Compiling...';
+                    elements.status.textContent = 'Compiling...';
                     showPlaceholder('Compiling your LilyPond + LaTeX document...', 'loading');
                     break;
                     
                 case 'compiled':
-                    statusEl.textContent = 'Compilation complete';
+                    elements.status.textContent = 'Compilation complete';
                     if (message.pdfData) {
                         loadPDF(message.pdfData);
                     } else {
@@ -294,20 +317,24 @@
                     break;
                     
                 case 'error':
-                    statusEl.textContent = 'Compilation failed';
+                    elements.status.textContent = 'Compilation failed';
                     showPlaceholder(message.error || 'Compilation failed', 'error');
                     break;
                     
                 case 'ready':
-                    statusEl.textContent = 'Ready';
+                    elements.status.textContent = 'Ready';
                     break;
                     
                 default:
                     console.log('Unknown command:', message.command);
             }
-        });
+        }
         
-        // Initial state
+        // ==============================================
+        // Initialization
+        // ==============================================
+        window.addEventListener('message', event => handleExtensionMessage(event.data));
+        setupPDFControls();
         showPlaceholder('Waiting for compilation...');
     </script>
 </body>

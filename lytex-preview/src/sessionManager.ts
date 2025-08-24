@@ -46,12 +46,11 @@ export class SessionManager {
             statusBarItems.delete(filePath);
         }
         
-        // Only dispose webview if it hasn't been disposed already
+        /* Only dispose webview if it hasn't been disposed already */
         if (webviewPanel && !isWebviewDisposed) {
             webviewPanel.dispose();
         }
         
-        // Clean up tracking maps
         activeWebviews.delete(filePath);
         webviewDisposedFlags.delete(filePath);
     }
@@ -85,5 +84,5 @@ export class SessionManager {
     }
 }
 
-// Export singleton instance
+/* Export singleton session manager */
 export const sessionManager = new SessionManager();
