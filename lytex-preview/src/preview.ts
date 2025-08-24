@@ -1,9 +1,13 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
+import * as fs from 'fs';
+import { createWebviewPanel } from './webview';
 
 /* Global state for preview sessions */
 const activePreviewSessions = new Map<string, vscode.Disposable>();
 const statusBarItems = new Map<string, vscode.StatusBarItem>();
+const activeWebviews = new Map<string, vscode.WebviewPanel>();
+
 
 export const preview = (context: vscode.ExtensionContext) =>  async (uri: vscode.Uri) => {
     if (!uri) {
@@ -19,16 +23,28 @@ export const preview = (context: vscode.ExtensionContext) =>  async (uri: vscode
     const filePath = uri.fsPath;
     const baseName = path.basename(filePath, '.lytex');
     
-    /* Check if already in preview session. TODO: remove the option to start a preveiw session if one is already active */
+    /* Check if already in preview session */
     if (activePreviewSessions.has(filePath)) {
         vscode.window.showInformationMessage('Preview session already active for this file!');
         return;
     }
+
+    /* Create webview panel */
+    const webviewPanel = createWebviewPanel(context, filePath);
+    activeWebviews.set(filePath, webviewPanel);
+    
     /* Start preview session - watch for saves on this file */
     const saveWatcher = vscode.workspace.onDidSaveTextDocument(async (document) => {
         if (document.uri.fsPath === filePath) {
             vscode.window.showInformationMessage(`Auto-save detected for ${baseName}.lytex`);
-            //TODO: compile on save
+            // TODO: Compilation on save
+
+            /* Send compile message to webview */
+            const webview = activeWebviews.get(filePath);
+            if (webview) {
+                webview.webview.postMessage({ command: 'compile' });
+            }
+        
         }
     });
 
@@ -38,7 +54,7 @@ export const preview = (context: vscode.ExtensionContext) =>  async (uri: vscode
     statusBarItems.set(filePath, statusBarItem); 
           
     vscode.window.showInformationMessage(
-        `Preview session started for ${baseName}.lytex! Session management active.`
+        `Preview session started for ${baseName}.lytex! Webview opened side by side.`
     );
 };
 
@@ -52,8 +68,17 @@ function createStatusBarItem(filePath: string): vscode.StatusBarItem {
     statusBarItem.color = '#ff6b6b'; // Red color
     statusBarItem.backgroundColor = new vscode.ThemeColor('statusBarItem.errorBackground');
     statusBarItem.show();
-    
+
     return statusBarItem;
+}
+
+export function sendMessageToWebview(filePath: string, message: any) {
+    const webview = activeWebviews.get(filePath);
+    if (webview) {
+        webview.webview.postMessage(message);
+        return true;
+    }
+    return false;
 }
 
 export const stopPreview = (context: vscode.ExtensionContext) => () => {
@@ -79,6 +104,7 @@ export const stopPreview = (context: vscode.ExtensionContext) => () => {
 function stopPreviewSession(filePath: string) {
     const session = activePreviewSessions.get(filePath);
     const statusBarItem = statusBarItems.get(filePath);
+    const webviewPanel = activeWebviews.get(filePath);
     
     if (session) {
         session.dispose();
@@ -88,6 +114,11 @@ function stopPreviewSession(filePath: string) {
     if (statusBarItem) {
         statusBarItem.dispose();
         statusBarItems.delete(filePath);
+    }
+    
+    if (webviewPanel) {
+        webviewPanel.dispose();
+        activeWebviews.delete(filePath);
     }
 }
 
@@ -99,4 +130,5 @@ export function cleanUpPreviewSessions() {
     
     activePreviewSessions.clear();
     statusBarItems.clear();
+    activeWebviews.clear();
 };

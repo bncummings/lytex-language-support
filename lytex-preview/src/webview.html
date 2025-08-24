@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LyTeX Preview</title>
+    <style>
+        body {
+            font-family: var(--vscode-font-family);
+            color: var(--vscode-foreground);
+            background-color: var(--vscode-editor-background);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+        
+        .preview-container {
+            text-align: center;
+            max-width: 600px;
+        }
+        
+        .title {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: var(--vscode-textLink-foreground);
+        }
+        
+        .subtitle {
+            font-size: 16px;
+            margin-bottom: 30px;
+            opacity: 0.8;
+        }
+        
+        .placeholder {
+            padding: 40px;
+            border: 2px dashed var(--vscode-panel-border);
+            border-radius: 8px;
+            background-color: var(--vscode-editor-background);
+            margin: 20px 0;
+        }
+        
+        .file-info {
+            background-color: var(--vscode-panel-background);
+            padding: 15px;
+            border-radius: 6px;
+            margin-top: 20px;
+            border-left: 4px solid var(--vscode-textLink-foreground);
+        }
+        
+        .status {
+            color: var(--vscode-notificationCenterHeader-foreground);
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+    <div class="preview-container">
+        <div class="title">🎼 LyTeX Preview</div>
+        <div class="subtitle">Live preview for LilyPond + LaTeX documents</div>
+        
+        <div class="placeholder">
+            <p><strong>Preview Session Active</strong></p>
+            <p>Save your .lytex file to see the compiled output here.</p>
+        </div>
+        
+        <div class="file-info">
+            <div class="status">File: <span id="filename">{{FILENAME}}</span></div>
+            <div>Status: <span id="status">Waiting for changes...</span></div>
+        </div>
+    </div>
+    
+    <script>
+        // Placeholder for future JavaScript functionality
+        console.log('LyTeX Preview webview loaded');
+        
+        // Listen for messages from the extension
+        window.addEventListener('message', event => {
+            const message = event.data;
+            switch (message.command) {
+                case 'update':
+                    console.log('Received update:', message);
+                    break;
+                case 'compile':
+                    document.getElementById('status').textContent = 'Compiling...';
+                    break;
+                case 'ready':
+                    document.getElementById('status').textContent = 'Ready';
+                    break;
+            }
+        });
+    </script>
+</body>
+</html>
