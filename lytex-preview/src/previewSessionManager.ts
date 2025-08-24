@@ -1,12 +1,12 @@
 import * as vscode from 'vscode';
+import { PreviewSession, SessionManager } from './types';
 
 /* Global state for preview sessions */
 const activePreviewSessions = new Map<string, vscode.Disposable>();
 const statusBarItems = new Map<string, vscode.StatusBarItem>();
 const activeWebviews = new Map<string, vscode.WebviewPanel>();
-const webviewDisposedFlags = new Map<string, boolean>();
 
-export class SessionManager {
+class PreviewSessionManager implements SessionManager {
     
     /**
      * Checks if a preview session exists for the given file path.
@@ -20,46 +20,17 @@ export class SessionManager {
     
     /**
      * Creates a new preview session with associated resources.
+     * Sets up automatic cleanup when the webview is disposed.
      * 
-     * @param {string} filePath - The absolute path to the LyTeX file
-     * @param {vscode.Disposable} saveWatcher - The file watcher for save events
-     * @param {vscode.StatusBarItem} statusBarItem - The status bar item for this session
-     * @param {vscode.WebviewPanel} webviewPanel - The webview panel for PDF display
+     * @param {PreviewSession} session - The complete preview session object
      */
-    createSession(filePath: string, saveWatcher: vscode.Disposable, statusBarItem: vscode.StatusBarItem, webviewPanel: vscode.WebviewPanel): void {
-        activePreviewSessions.set(filePath, saveWatcher);
-        statusBarItems.set(filePath, statusBarItem);
-        activeWebviews.set(filePath, webviewPanel);
-    }
-    
-    /**
-     * Retrieves the webview panel for a given file path.
-     * 
-     * @param {string} filePath - The absolute path to the LyTeX file
-     * @returns {vscode.WebviewPanel | undefined} The webview panel or undefined if not found
-     */
-    getWebview(filePath: string): vscode.WebviewPanel | undefined {
-        return activeWebviews.get(filePath);
-    }
-    
-    /**
-     * Marks a webview as disposed to prevent double-disposal.
-     * 
-     * @param {string} filePath - The absolute path to the LyTeX file
-     */
-    markWebviewDisposed(filePath: string): void {
-        webviewDisposedFlags.set(filePath, true);
-    }
-    
-    /**
-     * Checks if a webview has been disposed.
-     * 
-     * @param {string} filePath - The absolute path to the LyTeX file
-     * @returns {boolean} True if the webview has been disposed, false otherwise
-     */
-    isWebviewDisposed(filePath: string): boolean {
-        return webviewDisposedFlags.get(filePath) || false;
-    }
+    createSession(session: PreviewSession): void {
+        const filePath = session.filePath;
+        
+        activePreviewSessions.set(filePath, session.saveWatcher);
+        statusBarItems.set(filePath, session.statusBarItem);
+        activeWebviews.set(filePath, session.webviewPanel);
+    }    
     
     /**
      * Stops a preview session and cleans up all associated resources.
@@ -70,7 +41,6 @@ export class SessionManager {
         const session = activePreviewSessions.get(filePath);
         const statusBarItem = statusBarItems.get(filePath);
         const webviewPanel = activeWebviews.get(filePath);
-        const isWebviewDisposed = this.isWebviewDisposed(filePath);
         
         if (session) {
             session.dispose();
@@ -82,14 +52,13 @@ export class SessionManager {
             statusBarItems.delete(filePath);
         }
         
-        /* Only dispose webview if it hasn't been disposed already */
-        if (webviewPanel && !isWebviewDisposed) {
+        if (webviewPanel) {
             webviewPanel.dispose();
         }
         
         activeWebviews.delete(filePath);
-        webviewDisposedFlags.delete(filePath);
     }
+
     /**
      * Gets all active session file paths.
      * 
@@ -119,7 +88,6 @@ export class SessionManager {
         activePreviewSessions.clear();
         statusBarItems.clear();
         activeWebviews.clear();
-        webviewDisposedFlags.clear();
     }
     
     /**
@@ -145,4 +113,4 @@ export class SessionManager {
  * 
  * @type {SessionManager}
  */
-export const sessionManager = new SessionManager();
+export const sessionManager = new PreviewSessionManager();

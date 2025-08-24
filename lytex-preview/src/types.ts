@@ -5,7 +5,6 @@ import * as vscode from 'vscode';
  */
 export interface PreviewSession {
     filePath: string;
-    baseName: string;
     saveWatcher: vscode.Disposable;
     statusBarItem: vscode.StatusBarItem;
     webviewPanel: vscode.WebviewPanel;
@@ -20,14 +19,14 @@ export interface WebviewMessage {
 }
 
 /**
- * Interface for managing preview sessions (not currently used by the concrete SessionManager class).
+ * Interface for managing preview sessions.
  */
 export interface SessionManager {
     hasSession(filePath: string): boolean;
-    createSession(filePath: string, session: PreviewSession): void;
-    getSession(filePath: string): PreviewSession | undefined;
-    removeSession(filePath: string): void;
-    getAllSessions(): Map<string, PreviewSession>;
+    createSession(session: PreviewSession): void;
+    stopSession(filePath: string): void;
+    getAllSessionPaths(): string[];
+    getSessionCount(): number;
     cleanup(): void;
 }
 

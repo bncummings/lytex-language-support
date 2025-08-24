@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
-import { sessionManager } from '../sessionManager';
+import { sessionManager } from '../previewSessionManager';
 import { createWebviewPanel, compileAndDisplayPDF } from './webviewManager';
 import { createStatusBarItem } from '../statusBarManager';
 
@@ -49,7 +49,8 @@ export const preview = (context: vscode.ExtensionContext) => async (uri: vscode.
 
     /* Store the session and create status bar item */
     const statusBarItem = createStatusBarItem(filePath);
-    sessionManager.createSession(filePath, saveWatcher, statusBarItem, webviewPanel);
+    const session = { filePath, saveWatcher, statusBarItem, webviewPanel };
+    sessionManager.createSession(session);
 
     /* Initial compilation */
     vscode.window.showInformationMessage(
