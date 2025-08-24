@@ -4,6 +4,13 @@ import * as fs from 'fs';
 import { sessionManager } from '../sessionManager';
 import { compileLytexFile } from '../compile/compile';
 
+/**
+ * Creates a VS Code webview panel for LyTeX PDF preview.
+ * 
+ * @param {vscode.ExtensionContext} context - VS Code extension context
+ * @param {string} filePath - Path to the LyTeX file
+ * @returns {vscode.WebviewPanel} Configured webview panel for PDF display
+ */
 export function createWebviewPanel(context: vscode.ExtensionContext, filePath: string): vscode.WebviewPanel {
     const baseName = path.basename(filePath, '.lytex');
     const workspaceFolder = vscode.workspace.getWorkspaceFolder(vscode.Uri.file(filePath));
@@ -35,6 +42,13 @@ export function createWebviewPanel(context: vscode.ExtensionContext, filePath: s
     return webviewPanel;
 }
 
+/**
+ * Compiles a LyTeX file and displays the resulting PDF in the webview.
+ * 
+ * @param {vscode.ExtensionContext} context - VS Code extension context
+ * @param {string} filePath - Path to the LyTeX file to compile
+ * @returns {Promise<void>}
+ */
 export async function compileAndDisplayPDF(context: vscode.ExtensionContext, filePath: string): Promise<void> {
     try {
         sendMessageToWebview(filePath, { command: 'compile' });
@@ -55,6 +69,13 @@ export async function compileAndDisplayPDF(context: vscode.ExtensionContext, fil
     }
 }
 
+/**
+ * Sends a message to the webview for the specified file.
+ * 
+ * @param {string} filePath - Path to the LyTeX file associated with the webview
+ * @param {any} message - Message object to send to the webview
+ * @returns {boolean} True if message was sent successfully, false otherwise
+ */
 export function sendMessageToWebview(filePath: string, message: any): boolean {
     return sessionManager.sendMessageToWebview(filePath, message);
 }
