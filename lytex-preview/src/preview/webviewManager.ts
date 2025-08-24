@@ -92,12 +92,12 @@ function loadWebviewHtml(context: vscode.ExtensionContext, baseName: string, web
 }
 
 async function handleSuccessfulCompilation(filePath: string, pdfPath: string): Promise<void> {
-    console.log('Compilation successful, PDF path:', pdfPath);
-    
     /* Verify PDF file exists */
     if (!fs.existsSync(pdfPath)) {
         throw new Error(`PDF file not found at: ${pdfPath}`);
     }
+
+    console.log('Compilation successful, PDF path:', pdfPath);
     
     /* Encode PDF as base64 and send to webview */
     const pdfBuffer = fs.readFileSync(pdfPath);
