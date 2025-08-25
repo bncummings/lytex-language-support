@@ -6,5 +6,3 @@ const Config = {
     SCALE_STEP: 0.2,
     DEFAULT_SCALE: 1.6
 };
-
-

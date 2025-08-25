@@ -16,9 +16,11 @@ function renderPage(pageNumber) {
             const canvasWidth = viewport.width;
             const canvasHeight = viewport.height;
             
-            /* Set actual canvas size (accounting for device pixel ratio) */
+            /* Increase the size of the canvas (underneath) for a better resolution */
             DOM.canvas.width = canvasWidth * pixelRatio;
             DOM.canvas.height = canvasHeight * pixelRatio;
+
+            /* Keep the original size of the window */
             DOM.canvas.style.width = canvasWidth + 'px';
             DOM.canvas.style.height = canvasHeight + 'px';
             
@@ -67,6 +69,6 @@ function queuePageRender(pageNumber) {
  */
 function loadPDF(base64Data) {
     console.log('Loading PDF from base64 data...');
-    
+
     getPDFDocument(base64Data);
 }
