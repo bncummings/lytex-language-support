@@ -56,7 +56,8 @@ const AppState = {
     },
     
     ui: {
-        canvas: DOM.canvas.getContext('2d')
+        canvas: DOM.canvas.getContext('2d'),
+        devicePixelRatio: window.devicePixelRatio || 1
     },
     
     constants: {
@@ -127,9 +128,21 @@ function renderPage(pageNumber) {
         .then(page => {
             const viewport = page.getViewport({ scale: AppState.pdf.scale });
             
-            // Set canvas dimensions
-            DOM.canvas.height = viewport.height;
-            DOM.canvas.width = viewport.width;
+            // Calculate high-DPI canvas dimensions
+            const pixelRatio = AppState.ui.devicePixelRatio;
+            const canvasWidth = viewport.width;
+            const canvasHeight = viewport.height;
+            
+            // Set actual canvas size (accounting for device pixel ratio)
+            DOM.canvas.width = canvasWidth * pixelRatio;
+            DOM.canvas.height = canvasHeight * pixelRatio;
+            
+            // Set display size (CSS pixels)
+            DOM.canvas.style.width = canvasWidth + 'px';
+            DOM.canvas.style.height = canvasHeight + 'px';
+            
+            // Scale the context to ensure crisp rendering
+            AppState.ui.canvas.scale(pixelRatio, pixelRatio);
             
             const renderContext = {
                 canvasContext: AppState.ui.canvas,
