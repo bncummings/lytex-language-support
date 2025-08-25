@@ -2,38 +2,28 @@
  * Set up event listeners for PDF controls
  */
 function setupEventListeners() {
-    // Navigation controls
     DOM.prevPage.addEventListener('click', goToPreviousPage);
     DOM.nextPage.addEventListener('click', goToNextPage);
-    
-    // Zoom controls
     DOM.zoomIn.addEventListener('click', zoomIn);
     DOM.zoomOut.addEventListener('click', zoomOut);
-    
-    // Page number input
     DOM.pageNum.addEventListener('change', function() {
         goToPage(this.value);
     });
     
-    // Mouse wheel zoom and horizontal scroll
+    /* Mouse wheel zoom and horizontal scroll */
     const viewer = document.querySelector('.viewer');
     viewer.addEventListener('wheel', function(event) {
         if (event.ctrlKey || event.metaKey) {
-            // Zoom with Ctrl/Cmd + wheel
+            /* Zoom with Ctrl/Cmd + wheel */
             event.preventDefault();
-            if (event.deltaY < 0) {
-                zoomIn();
-            } else {
-                zoomOut();
-            }
+            event.deltaY < 0 ? zoomIn() : zoomOut();
         } else if (event.shiftKey) {
-            // Horizontal scroll with Shift + wheel
+            /* Horizontal scroll with Shift + wheel */
             event.preventDefault();
             viewer.scrollLeft += event.deltaY;
         }
     });
     
-    // Extension messages
     window.addEventListener('message', event => {
         handleExtensionMessage(event.data);
     });
@@ -74,10 +64,5 @@ function handleExtensionMessage(message) {
     };
     
     const handler = messageHandlers[message.command];
-    
-    if (handler) {
-        handler();
-    } else {
-        console.log('Unknown command:', message.command);
-    }
+    handler ? handler() : console.log('Unknown command:', message.command);
 }
