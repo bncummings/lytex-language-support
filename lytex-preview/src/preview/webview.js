@@ -284,6 +284,19 @@ function setupEventListeners() {
         goToPage(this.value);
     });
     
+    // Mouse wheel zoom
+    const viewer = document.querySelector('.viewer');
+    viewer.addEventListener('wheel', function(event) {
+        if (event.ctrlKey || event.metaKey) {
+            event.preventDefault();
+            if (event.deltaY < 0) {
+                zoomIn();
+            } else {
+                zoomOut();
+            }
+        }
+    });
+    
     // Extension messages
     window.addEventListener('message', event => {
         handleExtensionMessage(event.data);
