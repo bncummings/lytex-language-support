@@ -1,8 +1,4 @@
 /**
- * Event Handlers and Message Processing
- */
-
-/**
  * Set up event listeners for PDF controls
  */
 function setupEventListeners() {
