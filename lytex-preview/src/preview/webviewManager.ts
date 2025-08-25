@@ -80,13 +80,13 @@ export function sendMessageToWebview(filePath: string, message: any): boolean {
 }
 
 function loadWebviewHtml(context: vscode.ExtensionContext, baseName: string, webview: vscode.Webview): string {
-    const htmlPath = path.join(context.extensionPath, 'src', 'preview', 'webview.html');
-    const scriptPath = path.join(context.extensionPath, 'src', 'preview', 'webview.js');
-    const scriptUri = webview.asWebviewUri(vscode.Uri.file(scriptPath));
+    const htmlPath = path.join(context.extensionPath, 'src', 'preview', 'webview', 'webview.html');
+    const scriptDir = path.join(context.extensionPath, 'src', 'preview', 'webview');
+    const scriptDirUri = webview.asWebviewUri(vscode.Uri.file(scriptDir));
 
     let htmlContent = fs.readFileSync(htmlPath, 'utf8');
     htmlContent = htmlContent.replace('{{FILENAME}}', `${baseName}.lytex`);
-    htmlContent = htmlContent.replace('{{WEBVIEW_SCRIPT_URI}}', scriptUri.toString());
+    htmlContent = htmlContent.replace(/{{WEBVIEW_SCRIPT_URI}}/g, scriptDirUri.toString());
     
     return htmlContent;
 }
