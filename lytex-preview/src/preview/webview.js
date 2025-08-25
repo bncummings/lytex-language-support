@@ -297,16 +297,21 @@ function setupEventListeners() {
         goToPage(this.value);
     });
     
-    // Mouse wheel zoom
+    // Mouse wheel zoom and horizontal scroll
     const viewer = document.querySelector('.viewer');
     viewer.addEventListener('wheel', function(event) {
         if (event.ctrlKey || event.metaKey) {
+            // Zoom with Ctrl/Cmd + wheel
             event.preventDefault();
             if (event.deltaY < 0) {
                 zoomIn();
             } else {
                 zoomOut();
             }
+        } else if (event.shiftKey) {
+            // Horizontal scroll with Shift + wheel
+            event.preventDefault();
+            viewer.scrollLeft += event.deltaY;
         }
     });
     

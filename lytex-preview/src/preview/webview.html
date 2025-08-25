@@ -79,12 +79,16 @@
         .viewer {
             flex: 1;
             overflow: auto;
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
             padding: 10px;
             background: #525659;
             position: relative;
+        }
+        
+        .canvas-container {
+            display: inline-block;
+            min-width: 100%;
+            min-height: 100%;
+            text-align: center;
         }
         
         canvas {
@@ -118,7 +122,9 @@
                 <button id="zoom-in">+</button>
             </div>
             <div class="viewer">
-                <canvas id="pdf-canvas"></canvas>
+                <div class="canvas-container">
+                    <canvas id="pdf-canvas"></canvas>
+                </div>
             </div>
         </div>
     </main>
