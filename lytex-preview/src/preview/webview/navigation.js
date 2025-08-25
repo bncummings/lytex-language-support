@@ -1,8 +1,4 @@
 /**
- * Navigation Functions
- */
-
-/**
  * Navigate to previous page
  */
 function goToPreviousPage() {

@@ -1,7 +1,3 @@
-/**
- * Main Application Entry Point
- */
-
 console.log('LyTeX Preview webview loaded');
 
 /**
@@ -14,5 +10,5 @@ function initializeApp() {
     showPlaceholder('Waiting for compilation...');
 }
 
-// Start the application
+/* Start the application */
 initializeApp();

@@ -30,10 +30,9 @@ export const preview = (context: vscode.ExtensionContext) => async (uri: vscode.
         return;
     }
 
-    /* Create webview panel */
+    /* Start preview session */
     const webviewPanel = createWebviewPanel(context, filePath);
-    
-    /* Start preview session - watch for saves on this file */
+    const statusBarItem = createStatusBarItem(filePath);
     const saveWatcher = vscode.workspace.onDidSaveTextDocument(async (document) => {
         if (document.uri.fsPath === filePath) {
             vscode.window.showInformationMessage(`Auto-save detected for ${baseName}.lytex - recompiling...`);
@@ -47,8 +46,6 @@ export const preview = (context: vscode.ExtensionContext) => async (uri: vscode.
         }
     });
 
-    /* Store the session and create status bar item */
-    const statusBarItem = createStatusBarItem(filePath);
     const session = { filePath, saveWatcher, statusBarItem, webviewPanel };
     sessionManager.createSession(session);
 

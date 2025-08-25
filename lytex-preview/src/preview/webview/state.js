@@ -1,7 +1,6 @@
 /**
  * DOM Element Cache and State Management
  */
-
 const DOM = {
     status: document.getElementById('status'),
     message: document.getElementById('message'),
@@ -11,8 +10,6 @@ const DOM = {
     pageNum: document.getElementById('page-num'),
     pageCount: document.getElementById('page-count'),
     zoomLevel: document.getElementById('zoom-level'),
-    
-    // Control buttons
     prevPage: document.getElementById('prev-page'),
     nextPage: document.getElementById('next-page'),
     zoomIn: document.getElementById('zoom-in'),

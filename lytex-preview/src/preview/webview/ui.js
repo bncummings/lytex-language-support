@@ -1,8 +1,4 @@
 /**
- * UI Management Functions
- */
-
-/**
  * Display placeholder message and hide PDF container
  * @param {string} message - Message to display
  * @param {string} className - CSS class for styling

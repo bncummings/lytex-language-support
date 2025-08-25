@@ -1,8 +1,4 @@
 /**
- * PDF Rendering Functions
- */
-
-/**
  * Render a specific page of the PDF
  * @param {number} pageNumber - Page number to render
  */
@@ -13,27 +9,21 @@ function renderPage(pageNumber) {
     }
 
     AppState.pdf.isRendering = true;
-    
     AppState.pdf.document.getPage(pageNumber)
         .then(page => {
             const viewport = page.getViewport({ scale: AppState.pdf.scale });
-            
-            // Calculate high-DPI canvas dimensions
             const pixelRatio = AppState.ui.devicePixelRatio;
             const canvasWidth = viewport.width;
             const canvasHeight = viewport.height;
             
-            // Set actual canvas size (accounting for device pixel ratio)
+            /* Set actual canvas size (accounting for device pixel ratio) */
             DOM.canvas.width = canvasWidth * pixelRatio;
             DOM.canvas.height = canvasHeight * pixelRatio;
-            
-            // Set display size (CSS pixels)
             DOM.canvas.style.width = canvasWidth + 'px';
             DOM.canvas.style.height = canvasHeight + 'px';
             
-            // Scale the context to ensure crisp rendering
+            /* Scale-up and render the context */
             AppState.ui.canvas.scale(pixelRatio, pixelRatio);
-            
             const renderContext = {
                 canvasContext: AppState.ui.canvas,
                 viewport: viewport
@@ -44,7 +34,7 @@ function renderPage(pageNumber) {
         .then(() => {
             AppState.pdf.isRendering = false;
             
-            // Handle pending page render request
+            /* Handle pending page render request */
             if (AppState.pdf.pendingPageNumber !== null) {
                 renderPage(AppState.pdf.pendingPageNumber);
                 AppState.pdf.pendingPageNumber = null;
@@ -52,6 +42,7 @@ function renderPage(pageNumber) {
         })
         .catch(error => {
             console.error('Error rendering page:', error);
+            
             AppState.pdf.isRendering = false;
         });
     
@@ -77,20 +68,5 @@ function queuePageRender(pageNumber) {
 function loadPDF(base64Data) {
     console.log('Loading PDF from base64 data...');
     
-    const pdfDataUri = `data:application/pdf;base64,${base64Data}`;
-    
-    pdfjsLib.getDocument(pdfDataUri).promise
-        .then(pdfDocument => {
-            AppState.pdf.document = pdfDocument;
-            AppState.pdf.currentPage = 1;
-            
-            console.log(`PDF loaded successfully, pages: ${pdfDocument.numPages}`);
-            
-            showPDF();
-            renderPage(AppState.pdf.currentPage);
-        })
-        .catch(error => {
-            console.error('Error loading PDF:', error);
-            showPlaceholder(`Error loading PDF: ${error.message}`, 'error');
-        });
+    getPDFDocument(base64Data);
 }

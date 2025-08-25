@@ -1,8 +1,4 @@
 /**
- * Zoom Functions
- */
-
-/**
  * Increase zoom level
  */
 function zoomIn() {
